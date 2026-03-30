@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Veda AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- ✅ ALL 3 Firebase scripts needed -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+
+      <div class="sidebar-title">
+        <svg width="20" height="20" viewBox="0 0 38 38" fill="none">
+          <circle cx="19" cy="19" r="19" fill="#6c63ff"/>
+          <circle cx="19" cy="19" r="7" fill="none" stroke="white" stroke-width="1.5"/>
+          <line x1="19" y1="4" x2="19" y2="12" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="19" y1="26" x2="19" y2="34" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="4" y1="19" x2="12" y2="19" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="26" y1="19" x2="34" y2="19" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="8.5" y1="8.5" x2="14" y2="14" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="24" y1="24" x2="29.5" y2="29.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="29.5" y1="8.5" x2="24" y2="14" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="8.5" y1="29.5" x2="14" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="19" cy="19" r="3" fill="white"/>
+        </svg>
+        Abhi's AI
+      </div>
+
+      <!-- ✅ NEW: User Profile Section -->
+      <div class="user-profile" id="user-profile">
+        <img id="user-avatar" src="" alt="User" class="user-avatar-img"/>
+        <div class="user-info">
+          <div id="user-name" class="user-name-text">Loading...</div>
+          <div id="user-email" class="user-email-text">Loading...</div>
+        </div>
+        <button class="logout-btn" onclick="logoutUser()" title="Logout">⏻</button>
+      </div>
+
+      <button class="new-chat-btn" onclick="newChat()">+ New Chat</button>
+      <div class="history-label">Recent Chats</div>
+      <div id="history-list"></div>
+
+      <div class="sidebar-bottom">
+        <button class="clear-all-btn" onclick="clearAllChats()">🗑️ Clear All Chats</button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT CHAT AREA -->
+    <div class="chat-area">
+
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="veda-logo">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+              <defs>
+                <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#6c63ff"/>
+                  <stop offset="100%" style="stop-color:#a78bfa"/>
+                </linearGradient>
+              </defs>
+              <circle cx="19" cy="19" r="19" fill="url(#logoGrad)"/>
+              <circle cx="19" cy="19" r="7" fill="none" stroke="white" stroke-width="1.5"/>
+              <line x1="19" y1="4" x2="19" y2="12" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="19" y1="26" x2="19" y2="34" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="4" y1="19" x2="12" y2="19" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="26" y1="19" x2="34" y2="19" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="8.5" y1="8.5" x2="14" y2="14" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="24" y1="24" x2="29.5" y2="29.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="29.5" y1="8.5" x2="24" y2="14" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="8.5" y1="29.5" x2="14" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="19" cy="19" r="3" fill="white"/>
+            </svg>
+          </div>
+          <div class="topbar-title-group">
+            <span class="topbar-title">Veda <span class="topbar-title-ai">AI</span></span>
+            <span class="topbar-subtitle">Your Intelligent Assistant</span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="online-badge">
+            <span class="status-dot"></span>
+            <span>Online</span>
+          </div>
+          <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+      </div>
+
+      <div class="messages" id="messages">
+        <div class="welcome">
+          <h2>Hey! I am Veda, your AI Assistant 🌟</h2>
+          <p>Ask me anything — I'm here to help!</p>
+        </div>
+      </div>
+
+      <div class="input-wrapper">
+        <div class="input-area">
+          <textarea
+            id="user-input"
+            placeholder="Type your message here..."
+            rows="1"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+          <button id="send-btn" onclick="sendMessage()">Send ➤</button>
+        </div>
+        <div class="disclaimer">
+          ⚠️ Veda is AI and can make mistakes. Please double-check responses.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="./firebase-config.js"></script>
+  <script>
+    // ✅ Check login BEFORE loading anything
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+  <script src="./script.js?v=8"></script>
+
+</body>
+</html>
