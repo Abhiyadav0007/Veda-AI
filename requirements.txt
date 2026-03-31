@@ -3,3 +3,4 @@ flask-cors
 groq
 tavily-python
 python-dotenv
+gunicorn

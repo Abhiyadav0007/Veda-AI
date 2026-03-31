@@ -118,7 +118,7 @@ function getChatTitle() {
 
 async function generateSmartTitle(message) {
   try {
-    var response = await fetch("http://127.0.0.1:5000/generate-title", {
+    var response = await fetch("https://veda-ai-backend.onrender.com/generate-title", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: message })
@@ -421,7 +421,7 @@ async function sendMessage() {
   showTyping();
 
   try {
-    var response = await fetch("http://127.0.0.1:5000/chat", {
+    var response = await fetch("https://veda-ai-backend.onrender.com/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
