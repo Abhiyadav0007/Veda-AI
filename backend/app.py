@@ -224,7 +224,7 @@ def chat():
 
         # Stream the response
         def generate():
-    global current_key_index
+            global current_key_index
     
     if search_results:
         yield f"data: {json.dumps({'searching': True})}\n\n"
