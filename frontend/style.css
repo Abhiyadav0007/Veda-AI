@@ -826,3 +826,100 @@ textarea::placeholder { color: var(--text-muted); }
   color: #ff6b6b;
   background: #3a1a1a;
 }
+
+/* =====================
+   MOBILE RESPONSIVE
+   ===================== */
+
+@media (max-width: 768px) {
+
+  /* Hide sidebar by default on mobile */
+  .sidebar {
+    display: none;
+  }
+
+  /* Chat area takes full width */
+  .chat-area {
+    width: 100%;
+  }
+
+  /* Topbar smaller on mobile */
+  .topbar {
+    padding: 10px 14px;
+  }
+
+  .topbar-title {
+    font-size: 18px;
+  }
+
+  .topbar-subtitle {
+    display: none;
+  }
+
+  /* Online badge smaller */
+  .online-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  /* Messages padding smaller */
+  .messages {
+    padding: 10px 0;
+  }
+
+  /* Message bubbles full width */
+  .message {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .bubble {
+    font-size: 14px;
+    max-width: 85%;
+  }
+
+  .message.user .bubble {
+    max-width: 80%;
+  }
+
+  /* Input area */
+  .input-area {
+    padding: 10px 12px 6px;
+    gap: 8px;
+  }
+
+  textarea {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  #send-btn {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  /* Welcome screen */
+  .welcome h2 {
+    font-size: 18px;
+  }
+
+  .welcome p {
+    font-size: 13px;
+  }
+
+  /* Code blocks */
+  .code-block pre {
+    padding: 10px 12px;
+  }
+
+  .code-block code {
+    font-size: 12px;
+  }
+
+  /* Avatar smaller */
+  .avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+}
