@@ -11,22 +11,8 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 app = Flask(__name__)
 CORS(app)
 
-# Multiple API keys for rotation
-GROQ_KEYS = [
-    os.getenv("GROQ_API_KEY_1"),
-    os.getenv("GROQ_API_KEY_2"),
-    os.getenv("GROQ_API_KEY_3"),
-]
-
-# Remove any None keys
-GROQ_KEYS = [key for key in GROQ_KEYS if key]
-
-current_key_index = 0
-
-def get_groq_client():
-    global current_key_index
-    return Groq(api_key=GROQ_KEYS[current_key_index])
-
+# Your API keys
+groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
 SYSTEM_PROMPT = """You are Veda, a smart and friendly AI assistant created and owned by Mr. Abhishek Yadav.
@@ -224,16 +210,11 @@ def chat():
 
         # Stream the response
         def generate():
-            global current_key_index
-    
-    if search_results:
-        yield f"data: {json.dumps({'searching': True})}\n\n"
+            # First send search status if web search was used
+            if search_results:
+                yield f"data: {json.dumps({'searching': True})}\n\n"
 
-    # Try each API key until one works
-    for attempt in range(len(GROQ_KEYS)):
-        try:
-            client = get_groq_client()
-            stream = client.chat.completions.create(
+            stream = groq_client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=messages,
                 temperature=0.7,
@@ -246,6 +227,7 @@ def chat():
                 if token:
                     yield f"data: {json.dumps({'token': token})}\n\n"
 
+            # Send sources at the end if web search was used
             if search_results:
                 sources = []
                 for r in search_results[:3]:
@@ -256,67 +238,43 @@ def chat():
                 yield f"data: {json.dumps({'sources': sources})}\n\n"
 
             yield f"data: {json.dumps({'done': True})}\n\n"
-            return
 
-        except Exception as e:
-            error_str = str(e)
-            if "429" in error_str or "rate_limit" in error_str.lower():
-                # Switch to next key
-                current_key_index = (current_key_index + 1) % len(GROQ_KEYS)
-                print(f"Rate limit hit! Switching to key {current_key_index + 1}")
-                continue
-            else:
-                print("ERROR:", error_str)
-                yield f"data: {json.dumps({'token': 'Sorry, something went wrong. Please try again.'})}\n\n"
-                yield f"data: {json.dumps({'done': True})}\n\n"
-                return
+        return Response(generate(), mimetype="text/event-stream")
 
-    # All keys exhausted
-    yield f"data: {json.dumps({'token': 'All API limits reached. Please try again in a few minutes.'})}\n\n"
-    yield f"data: {json.dumps({'done': True})}\n\n"
+    except Exception as e:
+        print("ERROR:", str(e))
+        return jsonify({"error": str(e)}), 500
 
 
 # TITLE GENERATION ROUTE
 @app.route("/generate-title", methods=["POST"])
 def generate_title():
-    global current_key_index
     try:
         data = request.json
         first_message = data["message"]
 
-        for attempt in range(len(GROQ_KEYS)):
-            try:
-                client = get_groq_client()
-                response = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": "Generate a very short chat title (maximum 4 words) based on the user message. Return ONLY the title, nothing else. No quotes, no punctuation at the end."
-                        },
-                        {
-                            "role": "user",
-                            "content": first_message
-                        }
-                    ],
-                    max_tokens=20,
-                    temperature=0.5
-                )
-                title = response.choices[0].message.content.strip()
-                return jsonify({"title": title})
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Generate a very short chat title (maximum 4 words) based on the user message. Return ONLY the title, nothing else. No quotes, no punctuation at the end. Examples: 'Python Calculator Code', 'What is AI', 'Solar System Explained'"
+                },
+                {
+                    "role": "user",
+                    "content": first_message
+                }
+            ],
+            max_tokens=20,
+            temperature=0.5
+        )
 
-            except Exception as e:
-                if "429" in str(e):
-                    current_key_index = (current_key_index + 1) % len(GROQ_KEYS)
-                    continue
-                else:
-                    return jsonify({"title": "New Chat"})
-
-        return jsonify({"title": "New Chat"})
+        title = response.choices[0].message.content.strip()
+        return jsonify({"title": title})
 
     except Exception as e:
         print("Title error:", str(e))
-        return jsonify({"title": "New Chat"})
+        return jsonify({"title": "New Chat"}), 500
 
 
 # START SERVER
