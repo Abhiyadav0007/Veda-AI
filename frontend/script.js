@@ -42,38 +42,25 @@ function checkAuth() {
       window.location.href = "login.html";
       return;
     }
-
-    // ✅ User is logged in — save user info
     currentUser = user;
     console.log("Logged in as:", user.displayName, user.email);
 
-    // ✅ Show profile photo
     var avatar = document.getElementById("user-avatar");
     if (avatar) {
-      // If Google photo exists, use it. Otherwise make a letter avatar
       avatar.src = user.photoURL
         ? user.photoURL
         : "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.displayName || "User") + "&background=6c63ff&color=fff";
-      
-      // ✅ Fix: Google blocks images sometimes — this handles that error
       avatar.onerror = function() {
         avatar.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.displayName || "User") + "&background=6c63ff&color=fff";
       };
     }
 
-    // ✅ Show name
     var nameEl = document.getElementById("user-name");
-    if (nameEl) {
-      nameEl.textContent = user.displayName || "User";
-    }
+    if (nameEl) nameEl.textContent = user.displayName || "User";
 
-    // ✅ Show email
     var emailEl = document.getElementById("user-email");
-    if (emailEl) {
-      emailEl.textContent = user.email || "";
-    }
+    if (emailEl) emailEl.textContent = user.email || "";
 
-    // ✅ Now load chats
     newChat();
     loadSidebar();
   });
@@ -86,6 +73,11 @@ function logoutUser() {
     });
   }
 }
+
+// =====================
+// BACKEND URL
+// =====================
+var BACKEND_URL = "https://veda-ai-backend-69j6.onrender.com";
 
 // =====================
 // CHAT STORAGE
@@ -118,7 +110,7 @@ function getChatTitle() {
 
 async function generateSmartTitle(message) {
   try {
-    var response = await fetch("https://veda-ai-backend.onrender.com/generate-title", {
+    var response = await fetch(BACKEND_URL + "/generate-title", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: message })
@@ -421,7 +413,7 @@ async function sendMessage() {
   showTyping();
 
   try {
-    var response = await fetch("https://veda-ai-backend.onrender.com/chat", {
+    var response = await fetch(BACKEND_URL + "/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -467,7 +459,6 @@ async function sendMessage() {
                 bubble.innerHTML = '<span style="color:#6c63ff;font-size:13px;">🔍 Searching the web for latest information...</span>';
               }
             }
-
             else if (jsonData.sources) {
               var sourcesHtml = '<div class="sources-box"><div class="sources-title">🌐 Sources</div>';
               jsonData.sources.forEach(function(source) {
@@ -476,7 +467,6 @@ async function sendMessage() {
               sourcesHtml += '</div>';
               savedSourcesBox = sourcesHtml;
             }
-
             else if (jsonData.done) {
               var bubble = document.getElementById("streaming-bubble");
               if (bubble) {
@@ -488,7 +478,6 @@ async function sendMessage() {
                 }
               }
             }
-
             else if (jsonData.token) {
               fullText += jsonData.token;
               var bubble = document.getElementById("streaming-bubble");
@@ -498,7 +487,6 @@ async function sendMessage() {
                 messages.scrollTop = messages.scrollHeight;
               }
             }
-
           } catch(e) {}
         }
       }
