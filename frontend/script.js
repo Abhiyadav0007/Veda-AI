@@ -519,3 +519,20 @@ window.onload = function() {
   loadTheme();
   checkAuth();
 }
+
+// =====================
+// MOBILE SIDEBAR TOGGLE
+// =====================
+function toggleSidebar() {
+  var sidebar = document.querySelector(".sidebar");
+  var overlay = document.getElementById("sidebar-overlay");
+  sidebar.classList.toggle("open");
+  overlay.classList.toggle("open");
+}
+
+function closeSidebar() {
+  var sidebar = document.querySelector(".sidebar");
+  var overlay = document.getElementById("sidebar-overlay");
+  sidebar.classList.remove("open");
+  overlay.classList.remove("open");
+}

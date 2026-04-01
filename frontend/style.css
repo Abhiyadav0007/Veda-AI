@@ -923,3 +923,59 @@ textarea::placeholder { color: var(--text-muted); }
     font-size: 12px;
   }
 }
+
+/* HAMBURGER MENU BUTTON */
+.menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.menu-btn:hover {
+  background: var(--bg-hover);
+}
+
+@media (max-width: 768px) {
+  .menu-btn {
+    display: block;
+  }
+
+  /* Sidebar hidden by default on mobile */
+  .sidebar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 270px;
+    z-index: 999;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.4);
+  }
+
+  /* When sidebar is open */
+  .sidebar.open {
+    display: flex;
+  }
+
+  /* Dark overlay behind sidebar */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 998;
+  }
+
+  .sidebar-overlay.open {
+    display: block;
+  }
+}
